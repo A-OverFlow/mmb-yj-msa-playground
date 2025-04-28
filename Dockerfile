@@ -1,14 +1,23 @@
-# Java 17 버전 기반 이미지
-FROM openjdk:17-jdk-slim
+# 1단계: 빌드 스테이지
+FROM gradle:8.5-jdk17 AS build
 
-# 작업 디렉토리 설정
 WORKDIR /app
 
-# 빌드된 jar 파일 복사
-COPY ./build/libs/*.jar app.jar
+COPY build.gradle settings.gradle ./
 
-# 포트 오픈 (Spring Boot 서버 포트)
+RUN gradle dependencies --no-daemon || return 0
+
+COPY . .
+
+RUN gradle bootJar --no-daemon -x test
+
+# 2단계: 런타임 스테이지
+FROM eclipse-temurin:17-jdk-alpine
+
+WORKDIR /app
+
+COPY --from=build /app/build/libs/*.jar app.jar
+
 EXPOSE 8085
 
-# 실행
 ENTRYPOINT ["java", "-jar", "app.jar"]
