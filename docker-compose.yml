@@ -1,0 +1,33 @@
+# 개발 서버 배포 설정
+services:
+  app:
+    image: mumulbo/sample-yj:dev
+    env_file:
+      - .env
+    ports:
+      - "${SERVICE_PORT}:8085"
+    networks:
+      - external-net
+    depends_on:
+      - mongo
+    restart: always
+  # db 컨테이너만 실행 : docker compose up -d db
+  mongo:
+    image: mongo:latest
+    container_name: mmb-yj-msa-playground-mongo
+    ports:
+      - "${HOST_DB_PORT}:${CONTAINER_DB_PORT}"  # 호스트 27018 → 컨테이너 27017
+    environment:
+      MONGO_INITDB_DATABASE: ${DB_NAME}
+    volumes:
+      - sample_yj_mongodb_data:/var/lib/mysql
+    networks:
+      - external-net
+
+volumes:
+  sample_yj_mongodb_data:
+
+networks:
+  external-net:
+    external: true
+    name: sample-network
