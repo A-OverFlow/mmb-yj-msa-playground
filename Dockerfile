@@ -5,8 +5,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # 빌드된 jar 파일 복사
-RUN mkdir -p build/libs
-COPY build/libs/*.jar app.jar
+COPY ./build/libs/*.jar app.jar
 
 # 포트 오픈 (Spring Boot 서버 포트)
 EXPOSE 8085
