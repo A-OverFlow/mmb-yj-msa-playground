@@ -7,10 +7,15 @@ services:
     ports:
       - "${SERVICE_PORT}:8085"
     networks:
-      - external-net
+      - mumulbo-network
     depends_on:
       - mongo
     restart: always
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: mmb-fluentbit:24224
+        tag: mmb-yj-msa-playground
   # db 컨테이너만 실행 : docker compose up -d db
   mongo:
     image: mongo:latest
@@ -22,12 +27,12 @@ services:
     volumes:
       - sample_yj_mongodb_data:/var/lib/mysql
     networks:
-      - external-net
+      - mumulbo-network
 
 volumes:
   sample_yj_mongodb_data:
 
 networks:
-  external-net:
+  mumulbo-network:
     external: true
-    name: sample-network
+    driver: bridge
